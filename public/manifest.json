@@ -1,0 +1,22 @@
+{
+    "name": "SceneVox",
+    "short_name": "App",
+    "description": "Your App Description",
+    "icons": [
+      {
+        "src": "/MoodSwang.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/MoodSwang.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/"
+  }
+  
