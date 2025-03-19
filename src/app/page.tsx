@@ -61,7 +61,7 @@ export default function Home() {
           style={{ backgroundImage: "url('/Background.png')" }}
         ></div>
         <div className="absolute top-6 left-8 z-10">
-          <Image src="/moodswang.png" alt="MoodSwang logo" width={180} height={38} priority />
+          <Image src="/MoodSwang.png" alt="MoodSwang logo" width={180} height={38} priority />
         </div>
         <div className="absolute top-6 right-8 z-10 flex space-x-4">
           <Link href="/signin">
