@@ -47,9 +47,9 @@ export default function Home() {
 
   // Example data for featured films using moodswang.png for images
   const featuredFilms = [
-    { id: 1, title: "Film Festival Nominee", description: "A platform that connects through dreams and reality.", image: "/moodswang.png" },
-    { id: 2, title: "Netflix Director", description: "Distributed my film through this and best platform for indie filmmakers", image: "/moodswang.png" },
-    { id: 3, title: "SceneVox Testimonial", description: "films on this platform are visual masterpieces that capture the essence of time and space.", image: "/moodswang.png" },
+    { id: 1, title: "Film Festival Nominee", description: "A platform that connects through dreams and reality.", image: "/MoodSwang.png" },
+    { id: 2, title: "Netflix Director", description: "Distributed my film through this and best platform for indie filmmakers", image: "/MoodSwang.png" },
+    { id: 3, title: "SceneVox Testimonial", description: "films on this platform are visual masterpieces that capture the essence of time and space.", image: "/MoodSwang.png" },
   ];
 
   return (
