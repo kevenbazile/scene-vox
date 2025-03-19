@@ -5,34 +5,25 @@ import { createClient } from "@supabase/supabase-js";
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
-  // ✅ Read the auth token from cookies
+  // ✅ Fix: Read auth token from cookies
   const authToken = req.cookies.get("sb-access-token");
 
-  // ✅ Create Supabase client with token
+  // ✅ Fix: Create Supabase client with headers
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     { global: { headers: { Authorization: `Bearer ${authToken}` } } }
   );
 
-  // ✅ Get session details
-  const { data: { session } } = await supabase.auth.getSession();
-
+  const { data: session } = await supabase.auth.getSession();
   const protectedRoutes = ["/hub", "/agent", "/dashboard", "/profile"];
 
-  if (session) {
-    // ✅ Calculate session expiration timestamp (fixing the error)
-    const sessionExpiresAt = Math.floor(Date.now() / 1000) + session.expires_in;
-
-    const currentTime = Math.floor(Date.now() / 1000); // Current timestamp
-
-    if (sessionExpiresAt < currentTime) {
-      console.log("🚨 Session expired! Redirecting to re-auth...");
-      return NextResponse.redirect(new URL("/re-auth", req.url));
-    }
+  // ✅ Fix: Allow new customers to visit home & signin freely
+  if (!session && (req.nextUrl.pathname === "/" || req.nextUrl.pathname === "/signin")) {
+    return res;
   }
 
-  // ✅ Redirect users to sign in only if they try to access a protected route without a session
+  // ✅ Fix: Redirect unauthorized users only if they try to access protected routes
   if (!session && protectedRoutes.includes(req.nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
@@ -41,5 +32,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/hub/:path*", "/agent/:path*", "/dashboard/:path*", "/profile/:path*"],
+  matcher: ["/hub/:path*", "/agent/:path*", "/dashboard/:path*", "/profile/:path*", "/", "/signin"],
 };
