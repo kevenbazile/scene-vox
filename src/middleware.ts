@@ -8,25 +8,27 @@ export async function middleware(req: NextRequest) {
   // ✅ Get access token from cookies
   const authToken = req.cookies.get("sb-access-token")?.value; // Fix: Ensure cookie is read correctly
 
-  // ✅ Create Supabase client (without unnecessary headers)
+  // ✅ Create Supabase client
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // ✅ Get the session (Fix: Using auth.getUser() instead of getSession())
-  const { data: user, error } = await supabase.auth.getUser(authToken || "");
+  // ✅ Fetch user session properly
+  const { data, error } = await supabase.auth.getUser(authToken || "");
 
-  // List of protected routes (only for authenticated users)
+  const user = data?.user; // ✅ Fix: Extract the actual user
+
+  // List of protected routes
   const protectedRoutes = ["/hub", "/agent", "/dashboard", "/profile"];
   
   // ✅ Allow unauthenticated access to home & sign-in pages
-  if (!user?.id && (req.nextUrl.pathname === "/" || req.nextUrl.pathname === "/signin")) {
+  if (!user && (req.nextUrl.pathname === "/" || req.nextUrl.pathname === "/signin")) {
     return res;
   }
 
   // ✅ Redirect unauthorized users from protected pages
-  if (!user?.id && protectedRoutes.includes(req.nextUrl.pathname)) {
+  if (!user && protectedRoutes.includes(req.nextUrl.pathname)) {
     console.log("Unauthorized access, redirecting to login...");
     return NextResponse.redirect(new URL("/signin", req.url));
   }
@@ -38,4 +40,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/hub/:path*", "/agent/:path*", "/dashboard/:path*", "/profile/:path*", "/", "/signin"],
 };
-
