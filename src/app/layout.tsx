@@ -1,6 +1,11 @@
+"use client"; // ✅ Ensure this is a Client Component
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ServiceWorkerRegistration from "./ServiceWorkerRegistration";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabase"; // ✅ Ensure correct Supabase import
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,7 +17,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// 🔥 List of protected pages (users MUST be logged in to access these)
+const protectedRoutes = ["/hub", "/agent", "/dashboard", "/profile"];
+
+export default function RootLayoutClient({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname(); // ✅ Get the current route
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkUserSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+      setLoading(false);
+    }
+
+    checkUserSession();
+  }, []);
+
+  // ✅ Redirect users trying to access protected routes if not logged in
+  useEffect(() => {
+    if (!loading && !user && protectedRoutes.includes(pathname)) {
+      console.log("Unauthorized access attempt! Redirecting to login...");
+      router.push("/signin"); // ✅ Redirect to login page if not signed in
+    }
+  }, [pathname, user, loading, router]);
+
   return (
     <html lang="en">
       <head>
@@ -22,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ServiceWorkerRegistration />
-        {children} {/* ✅ Now the app will load without checking auth */}
+        {!loading && children} {/* ✅ Show content only after checking session */}
       </body>
     </html>
   );
