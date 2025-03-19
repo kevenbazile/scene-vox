@@ -5,8 +5,8 @@ import { createClient } from "@supabase/supabase-js";
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
-  // ✅ Fix: Read auth token from cookies
-  const authToken = req.cookies.get("sb-access-token");
+  // ✅ Fix: Read auth token from headers instead of cookies
+  const authToken = req.headers.get("Authorization")?.replace("Bearer ", "");
 
   // ✅ Fix: Create Supabase client with headers
   const supabase = createClient(
@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
   const { data: session } = await supabase.auth.getSession();
   const protectedRoutes = ["/hub", "/agent", "/dashboard", "/profile"];
 
-  // ✅ Fix: Allow new customers to visit home & signin freely
+  // ✅ Fix: Allow home & signin freely
   if (!session && (req.nextUrl.pathname === "/" || req.nextUrl.pathname === "/signin")) {
     return res;
   }
@@ -34,4 +34,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/hub/:path*", "/agent/:path*", "/dashboard/:path*", "/profile/:path*", "/", "/signin"],
 };
-
