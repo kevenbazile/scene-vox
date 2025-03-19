@@ -34,3 +34,4 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/hub/:path*", "/agent/:path*", "/dashboard/:path*", "/profile/:path*", "/", "/signin"],
 };
+
