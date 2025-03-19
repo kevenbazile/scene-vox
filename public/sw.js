@@ -1,7 +1,7 @@
 if (!self.define) {
   let e, s = {};
   const a = (a, t) => (
-    a = new URL(a + ".js", t).href, 
+    a = new URL(a + ".js", t).href,
     s[a] || new Promise((s => {
       if ("document" in self) {
         const e = document.createElement("script");
@@ -60,9 +60,15 @@ define(["./workbox-4754cb34"], function (e) {
     new e.NetworkFirst({ cacheName: "nextjs-files" })
   );
 
-  // Prevent Workbox from caching Supabase Storage URLs using our custom network-only strategy
+  // Prevent Workbox from caching Supabase Storage URLs using our custom NetworkOnly strategy
   e.registerRoute(
     ({ url }) => url.hostname.includes("supabase.co"),
+    new NetworkOnlyStrategy()
+  );
+
+  // Exclude the sign-in page from caching (always fetch from network)
+  e.registerRoute(
+    ({ url }) => url.pathname.startsWith("/signin"),
     new NetworkOnlyStrategy()
   );
 
